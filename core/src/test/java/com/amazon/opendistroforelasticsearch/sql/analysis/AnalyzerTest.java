@@ -58,7 +58,7 @@ import com.amazon.opendistroforelasticsearch.sql.exception.SemanticCheckExceptio
 import com.amazon.opendistroforelasticsearch.sql.expression.DSL;
 import com.amazon.opendistroforelasticsearch.sql.expression.config.ExpressionConfig;
 import com.amazon.opendistroforelasticsearch.sql.expression.window.WindowDefinition;
-import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalKmeans;
+import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalMachineLearning;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalPlanDSL;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -630,7 +630,9 @@ class AnalyzerTest extends AnalyzerTestBase {
   @Test
   public void kmeans_relation() {
     assertAnalyzeEqual(
-        new LogicalKmeans(LogicalPlanDSL.relation("schema"), 3),
+        new LogicalMachineLearning(LogicalPlanDSL.relation("schema"),
+            "kmeans",
+            AstDSL.exprList(AstDSL.argument("k", AstDSL.intLiteral(3)))),
         new Kmeans(AstDSL.relation("schema"),
             AstDSL.exprList(AstDSL.argument("k", AstDSL.intLiteral(3))))
     );

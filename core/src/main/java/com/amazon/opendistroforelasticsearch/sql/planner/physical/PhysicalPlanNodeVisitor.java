@@ -92,10 +92,6 @@ public abstract class PhysicalPlanNodeVisitor<R, C> {
     return visitNode(node, context);
   }
 
-  public R visitKmeans(PhysicalPlan node, C context) {
-    return visitNode(node, context);
-  }
-
   public R visitMachineLearning(PhysicalPlan node, C context) {
     return visitNode(node, context);
   }

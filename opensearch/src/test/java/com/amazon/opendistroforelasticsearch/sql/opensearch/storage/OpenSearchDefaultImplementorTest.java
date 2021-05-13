@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.amazon.opendistroforelasticsearch.sql.opensearch.client.OpenSearchClient;
-import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalKmeans;
+import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalMachineLearning;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalPlan;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,11 +71,12 @@ public class OpenSearchDefaultImplementorTest {
   }
 
   @Test
-  public void visitKmeans() {
-    LogicalKmeans node = Mockito.mock(LogicalKmeans.class, Answers.RETURNS_DEEP_STUBS);
+  public void visitMachineLearning() {
+    LogicalMachineLearning node = Mockito.mock(LogicalMachineLearning.class,
+        Answers.RETURNS_DEEP_STUBS);
     Mockito.when(node.getChild().get(0)).thenReturn(Mockito.mock(LogicalPlan.class));
     OpenSearchIndex.OpenSearchDefaultImplementor implementor =
         new OpenSearchIndex.OpenSearchDefaultImplementor(indexScan, client);
-    assertNotNull(implementor.visitKmeans(node, indexScan));
+    assertNotNull(implementor.visitMachineLearning(node, indexScan));
   }
 }

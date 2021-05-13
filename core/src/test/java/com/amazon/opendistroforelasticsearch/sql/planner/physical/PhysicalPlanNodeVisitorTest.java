@@ -155,11 +155,11 @@ class PhysicalPlanNodeVisitorTest extends PhysicalPlanTestBase {
   }
 
   @Test
-  public void test_visitKmeans() {
+  public void test_visitMachineLearning() {
     PhysicalPlanNodeVisitor physicalPlanNodeVisitor
         = new PhysicalPlanNodeVisitor<Integer, Object>() {};
 
-    assertNull(physicalPlanNodeVisitor.visitKmeans(plan, null));
+    assertNull(physicalPlanNodeVisitor.visitMachineLearning(plan, null));
   }
 
   public static class PhysicalPlanPrinter extends PhysicalPlanNodeVisitor<String, Integer> {

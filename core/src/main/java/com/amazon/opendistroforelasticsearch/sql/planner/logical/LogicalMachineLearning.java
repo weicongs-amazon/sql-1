@@ -20,6 +20,12 @@ public class LogicalMachineLearning extends LogicalPlan {
 
   public LogicalMachineLearning(LogicalPlan child,
                                 String algorithm,
+                                List<Argument> arguments){
+    this(child, algorithm, arguments, null);
+  }
+
+  public LogicalMachineLearning(LogicalPlan child,
+                                String algorithm,
                                 List<Argument> arguments,
                                 String modelId) {
     super(Collections.singletonList(child));

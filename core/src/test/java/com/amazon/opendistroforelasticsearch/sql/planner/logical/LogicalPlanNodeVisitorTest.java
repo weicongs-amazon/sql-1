@@ -30,6 +30,7 @@ import static com.amazon.opendistroforelasticsearch.sql.expression.DSL.named;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import com.amazon.opendistroforelasticsearch.sql.ast.dsl.AstDSL;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.RareTopN.CommandType;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.Sort.SortOption;
 import com.amazon.opendistroforelasticsearch.sql.expression.DSL;
@@ -129,8 +130,10 @@ class LogicalPlanNodeVisitorTest {
     assertNull(rareTopN.accept(new LogicalPlanNodeVisitor<Integer, Object>() {
     }, null));
 
-    LogicalPlan kmeans = new LogicalKmeans(relation, 3);
-    assertNull(kmeans.accept(new LogicalPlanNodeVisitor<Integer, Object>() {
+    LogicalPlan machineLearning = new LogicalMachineLearning(LogicalPlanDSL.relation("schema"),
+        "kmeans",
+        AstDSL.exprList(AstDSL.argument("k", AstDSL.intLiteral(3))));
+    assertNull(machineLearning.accept(new LogicalPlanNodeVisitor<Integer, Object>() {
     }, null));
   }
 

@@ -29,7 +29,6 @@
 package com.amazon.opendistroforelasticsearch.sql.opensearch.executor.protector;
 
 import com.amazon.opendistroforelasticsearch.sql.monitor.ResourceMonitor;
-import com.amazon.opendistroforelasticsearch.sql.opensearch.planner.physical.KmeansOperator;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.planner.physical.MachineLearningOperator;
 import com.amazon.opendistroforelasticsearch.sql.planner.physical.AggregationOperator;
 import com.amazon.opendistroforelasticsearch.sql.planner.physical.DedupeOperator;
@@ -149,21 +148,12 @@ public class OpenSearchExecutionProtector extends ExecutionProtector {
         node.getOffset());
   }
 
-
-  @Override
-  public PhysicalPlan visitKmeans(PhysicalPlan node, Object context) {
-    KmeansOperator kmeansOperator = (KmeansOperator) node;
-    return new KmeansOperator(visitInput(kmeansOperator.getInput(), context),
-        kmeansOperator.getNumberOfClusters(),
-        kmeansOperator.getMachineLearningClient());
-  }
-
   @Override
   public PhysicalPlan visitMachineLearning(PhysicalPlan node, Object context) {
     MachineLearningOperator machineLearningOperator = (MachineLearningOperator) node;
     return new MachineLearningOperator(visitInput(machineLearningOperator.getInput(), context),
         machineLearningOperator.getAlgorithm(),
-        machineLearningOperator.getParameters(),
+        machineLearningOperator.getArguments(),
         machineLearningOperator.getModelId(),
         machineLearningOperator.getMachineLearningClient());
   }

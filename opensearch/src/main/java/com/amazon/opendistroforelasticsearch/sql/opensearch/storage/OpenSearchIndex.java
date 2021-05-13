@@ -35,14 +35,14 @@ import com.amazon.opendistroforelasticsearch.sql.opensearch.data.value.OpenSearc
 import com.amazon.opendistroforelasticsearch.sql.opensearch.planner.logical.OpenSearchLogicalIndexAgg;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.planner.logical.OpenSearchLogicalIndexScan;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.planner.logical.OpenSearchLogicalPlanOptimizerFactory;
-import com.amazon.opendistroforelasticsearch.sql.opensearch.planner.physical.KmeansOperator;
+import com.amazon.opendistroforelasticsearch.sql.opensearch.planner.physical.MachineLearningOperator;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.request.system.OpenSearchDescribeIndexRequest;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.storage.script.aggregation.AggregationQueryBuilder;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.storage.script.filter.FilterQueryBuilder;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.storage.script.sort.SortQueryBuilder;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.storage.serialization.DefaultExpressionSerializer;
 import com.amazon.opendistroforelasticsearch.sql.planner.DefaultImplementor;
-import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalKmeans;
+import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalMachineLearning;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalPlan;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalRelation;
 import com.amazon.opendistroforelasticsearch.sql.planner.physical.PhysicalPlan;
@@ -183,8 +183,10 @@ public class OpenSearchIndex implements Table {
     }
 
     @Override
-    public PhysicalPlan visitKmeans(LogicalKmeans node, OpenSearchIndexScan context) {
-      return new KmeansOperator(visitChild(node, context), node.getNumberOfClusters(), client.ml());
+    public PhysicalPlan visitMachineLearning(LogicalMachineLearning node,
+                                             OpenSearchIndexScan context) {
+      return new MachineLearningOperator(visitChild(node, context), node.getAlgorithm(),
+          node.getArguments(), node.getModelId(), client.ml());
     }
   }
 }

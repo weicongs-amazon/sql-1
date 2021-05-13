@@ -1,5 +1,6 @@
 package com.amazon.opendistroforelasticsearch.sql.opensearch.planner.physical;
 
+import com.amazon.opendistroforelasticsearch.sql.ast.expression.Argument;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprDoubleValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprIntegerValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprStringValue;
@@ -15,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -26,6 +28,7 @@ import org.opensearch.ml.common.dataframe.DataFrame;
 import org.opensearch.ml.common.dataframe.DataFrameBuilder;
 import org.opensearch.ml.common.dataframe.Row;
 import org.opensearch.ml.common.parameter.MLParameter;
+import org.opensearch.ml.common.parameter.MLParameterBuilder;
 
 @RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = false)
@@ -37,7 +40,7 @@ public class MachineLearningOperator extends PhysicalPlan {
   private final String algorithm;
 
   @Getter
-  private final List<MLParameter> parameters;
+  private final List<Argument> arguments;
 
   @Getter
   private final String modelId;
@@ -52,12 +55,35 @@ public class MachineLearningOperator extends PhysicalPlan {
   public void open() {
     super.open();
     DataFrame inputDataFrame = generateInputDataset();
-    DataFrame predictionResult = machineLearningClient.predict(algorithm, parameters, inputDataFrame, modelId)
+    List<MLParameter> mlParameters = arguments.stream().map(this::convertArgumentToMLParameter)
+        .collect(Collectors.toList());
+    DataFrame predictionResult = machineLearningClient
+        .predict(algorithm, mlParameters, inputDataFrame, modelId)
         .actionGet(30, TimeUnit.SECONDS);
     ColumnMeta[] columnMetas = predictionResult.columnMetas();
     iterator = StreamSupport.stream(predictionResult.spliterator(), false)
       .map(row -> convertRowIntoExprValue(columnMetas, row))
       .iterator();
+  }
+
+  protected MLParameter convertArgumentToMLParameter(Argument argument) {
+    switch (argument.getValue().getType()) {
+      case INTEGER:
+        return MLParameterBuilder.parameter(argument.getArgName(),
+            (Integer) argument.getValue().getValue());
+      case STRING:
+        return MLParameterBuilder.parameter(argument.getArgName(),
+            (String)argument.getValue().getValue());
+      case BOOLEAN:
+        return MLParameterBuilder.parameter(argument.getArgName(),
+            (Boolean)argument.getValue().getValue());
+      case DOUBLE:
+        return MLParameterBuilder.parameter(argument.getArgName(),
+            (Double)argument.getValue().getValue());
+      default:
+        throw new IllegalArgumentException("unsupported argument type:"
+            + argument.getValue().getType());
+    }
   }
 
   private ExprValue convertRowIntoExprValue(ColumnMeta[] columnMetas, Row row) {

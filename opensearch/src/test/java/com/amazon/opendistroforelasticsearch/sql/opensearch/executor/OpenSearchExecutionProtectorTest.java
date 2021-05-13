@@ -44,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.amazon.opendistroforelasticsearch.sql.ast.dsl.AstDSL;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.RareTopN.CommandType;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.Sort;
 import com.amazon.opendistroforelasticsearch.sql.common.setting.Settings;
@@ -62,7 +63,7 @@ import com.amazon.opendistroforelasticsearch.sql.opensearch.client.OpenSearchCli
 import com.amazon.opendistroforelasticsearch.sql.opensearch.data.value.OpenSearchExprValueFactory;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.executor.protector.OpenSearchExecutionProtector;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.executor.protector.ResourceMonitorPlan;
-import com.amazon.opendistroforelasticsearch.sql.opensearch.planner.physical.KmeansOperator;
+import com.amazon.opendistroforelasticsearch.sql.opensearch.planner.physical.MachineLearningOperator;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.setting.OpenSearchSettings;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.storage.OpenSearchIndexScan;
 import com.amazon.opendistroforelasticsearch.sql.planner.physical.PhysicalPlan;
@@ -277,12 +278,16 @@ class OpenSearchExecutionProtectorTest {
   }
 
   @Test
-  public void testVisitKmeans() {
+  public void testVisitMachineLearning() {
     MachineLearningClient machineLearningClient = mock(MachineLearningClient.class);
-    KmeansOperator kmeansOperator = new KmeansOperator(values(emptyList()),
-        3,
+    MachineLearningOperator machineLearningOperator = new MachineLearningOperator(
+        values(emptyList()),
+        "kmeans",
+        AstDSL.exprList(AstDSL.argument("k1", AstDSL.intLiteral(3))),
+        null,
         machineLearningClient);
-    assertEquals(kmeansOperator, executionProtector.visitKmeans(kmeansOperator, null));
+    assertEquals(machineLearningOperator,
+        executionProtector.visitMachineLearning(machineLearningOperator, null));
   }
 
   PhysicalPlan resourceMonitor(PhysicalPlan input) {

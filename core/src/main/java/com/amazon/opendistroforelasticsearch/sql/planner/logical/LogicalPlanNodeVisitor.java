@@ -90,10 +90,6 @@ public abstract class LogicalPlanNodeVisitor<R, C> {
     return visitNode(plan, context);
   }
 
-  public R visitKmeans(LogicalKmeans plan, C context) {
-    return visitNode(plan, context);
-  }
-
   public R visitMachineLearning(LogicalMachineLearning plan, C context) {
     return visitNode(plan, context);
   }

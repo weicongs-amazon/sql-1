@@ -71,8 +71,8 @@ import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalAggregat
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalDedupe;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalEval;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalFilter;
-import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalKmeans;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalLimit;
+import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalMachineLearning;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalPlan;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalProject;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalRareTopN;
@@ -378,20 +378,19 @@ public class Analyzer extends AbstractNodeVisitor<LogicalPlan, AnalysisContext> 
   }
 
   /**
-   * Build {@link LogicalKmeans}.
+   * Build {@link LogicalMachineLearning} for Kmeans command.
    */
   @Override
   public LogicalPlan visitKmeans(Kmeans node, AnalysisContext context) {
     LogicalPlan child = node.getChild().get(0).accept(this, context);
     List<Argument> options = node.getOptions();
-    Integer numberOfClusters = (Integer) (options.get(0).getValue().getValue());
 
     context.push();
     TypeEnvironment newEnv = context.peek();
     newEnv.define(new Symbol(Namespace.FIELD_NAME,
         "clusterId"), ExprCoreType.INTEGER);
 
-    return new LogicalKmeans(child, numberOfClusters);
+    return new LogicalMachineLearning(child, "kmeans", options);
   }
 
   @Override

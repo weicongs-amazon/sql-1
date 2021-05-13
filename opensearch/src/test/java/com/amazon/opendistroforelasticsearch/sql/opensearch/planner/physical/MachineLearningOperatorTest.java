@@ -3,6 +3,7 @@ package com.amazon.opendistroforelasticsearch.sql.opensearch.planner.physical;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
@@ -12,6 +13,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import com.amazon.opendistroforelasticsearch.sql.ast.dsl.AstDSL;
+import com.amazon.opendistroforelasticsearch.sql.ast.expression.Argument;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprIntegerValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprTupleValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprValue;
@@ -33,19 +36,27 @@ import org.opensearch.ml.common.dataframe.DataFrameBuilder;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class KmeansOperatorTest {
-
+class MachineLearningOperatorTest {
   @Mock
   private PhysicalPlan input;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MachineLearningClient machineLearningClient;
 
-  private KmeansOperator kmeansOperator;
+  private MachineLearningOperator machineLearningOperator;
 
   @BeforeEach
-  void setup() {
-    kmeansOperator = new KmeansOperator(input, 3, machineLearningClient);
+  void setUp() {
+    machineLearningOperator = new MachineLearningOperator(input,
+        "kmeans",
+        AstDSL.exprList(AstDSL.argument("k1", AstDSL.intLiteral(3)),
+            AstDSL.argument("k2", AstDSL.stringLiteral("v1")),
+            AstDSL.argument("k3", AstDSL.booleanLiteral(true)),
+            AstDSL.argument("k4", AstDSL.doubleLiteral(2.0D))
+            ),
+        "modelId",
+        machineLearningClient);
+
     when(input.hasNext()).thenReturn(true).thenReturn(false);
     ImmutableMap.Builder<String, ExprValue> resultBuilder = new ImmutableMap.Builder<>();
     resultBuilder.put("k1", new ExprIntegerValue(2));
@@ -58,32 +69,30 @@ public class KmeansOperatorTest {
             .put("k4", true)
             .build())
         );
-    when(machineLearningClient.predict(anyString(), anyList(), any())
+    when(machineLearningClient.predict(anyString(), anyList(), any(DataFrame.class), anyString())
         .actionGet(anyLong(), eq(TimeUnit.SECONDS)))
         .thenReturn(dataFrame);
   }
 
   @Test
   public void testOpen() {
-    kmeansOperator.open();
-    assertTrue(kmeansOperator.hasNext());
-    assertNotNull(kmeansOperator.next());
-    assertFalse(kmeansOperator.hasNext());
-  }
-
-  @Test
-  public void testOpen_withNullClusterNo() {
-    kmeansOperator = new KmeansOperator(input, null, machineLearningClient);
-    kmeansOperator.open();
-    assertTrue(kmeansOperator.hasNext());
-    assertNotNull(kmeansOperator.next());
-    assertFalse(kmeansOperator.hasNext());
+    machineLearningOperator.open();
+    assertTrue(machineLearningOperator.hasNext());
+    assertNotNull(machineLearningOperator.next());
+    assertFalse(machineLearningOperator.hasNext());
   }
 
   @Test
   public void testAccept() {
     PhysicalPlanNodeVisitor physicalPlanNodeVisitor
         = new PhysicalPlanNodeVisitor<Integer, Object>() {};
-    assertNull(kmeansOperator.accept(physicalPlanNodeVisitor, null));
+    assertNull(machineLearningOperator.accept(physicalPlanNodeVisitor, null));
+  }
+
+  @Test
+  public void testConvertArgumentToMLParameter_UnSupportedType() {
+    Argument argument = AstDSL.argument("k2", AstDSL.dateLiteral("2020-10-31"));
+    assertThrows(IllegalArgumentException.class,
+        () -> machineLearningOperator.convertArgumentToMLParameter(argument));
   }
 }
