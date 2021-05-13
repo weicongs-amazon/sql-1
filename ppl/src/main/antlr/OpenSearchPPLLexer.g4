@@ -42,6 +42,7 @@ EVAL:                               'EVAL';
 HEAD:                               'HEAD';
 TOP:                                'TOP';
 RARE:                               'RARE';
+KMEANS:                             'KMEANS';
 
 // COMMAND ASSIST KEYWORDS
 AS:                                 'AS';
@@ -104,6 +105,9 @@ DAY_SECOND:                         'DAY_SECOND';
 DAY_MINUTE:                         'DAY_MINUTE';
 DAY_HOUR:                           'DAY_HOUR';
 YEAR_MONTH:                         'YEAR_MONTH';
+
+
+//MACHINE LEARNING ALGORITHMS RELATED KEYWORDS
 
 // DATASET TYPES
 DATAMODEL:                          'DATAMODEL';

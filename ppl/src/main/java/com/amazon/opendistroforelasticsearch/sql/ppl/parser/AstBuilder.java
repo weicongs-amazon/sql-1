@@ -52,6 +52,7 @@ import com.amazon.opendistroforelasticsearch.sql.ast.tree.Dedupe;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.Eval;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.Filter;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.Head;
+import com.amazon.opendistroforelasticsearch.sql.ast.tree.Kmeans;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.Project;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.RareTopN;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.RareTopN.CommandType;
@@ -63,6 +64,7 @@ import com.amazon.opendistroforelasticsearch.sql.common.utils.StringUtils;
 import com.amazon.opendistroforelasticsearch.sql.ppl.antlr.parser.OpenSearchPPLParser;
 import com.amazon.opendistroforelasticsearch.sql.ppl.antlr.parser.OpenSearchPPLParser.ByClauseContext;
 import com.amazon.opendistroforelasticsearch.sql.ppl.antlr.parser.OpenSearchPPLParser.FieldListContext;
+import com.amazon.opendistroforelasticsearch.sql.ppl.antlr.parser.OpenSearchPPLParser.KmeansCommandContext;
 import com.amazon.opendistroforelasticsearch.sql.ppl.antlr.parser.OpenSearchPPLParserBaseVisitor;
 import com.amazon.opendistroforelasticsearch.sql.ppl.utils.ArgumentFactory;
 import com.google.common.collect.ImmutableList;
@@ -270,6 +272,14 @@ public class AstBuilder extends OpenSearchPPLParserBaseVisitor<UnresolvedPlan> {
         getFieldList(ctx.fieldList()),
         groupList
     );
+  }
+
+  /**
+   * Kmeans ML command.
+   */
+  @Override
+  public UnresolvedPlan visitKmeansCommand(KmeansCommandContext ctx) {
+    return new Kmeans(ArgumentFactory.getArgumentList(ctx));
   }
 
   /**

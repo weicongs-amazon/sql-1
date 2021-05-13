@@ -50,6 +50,7 @@ import org.opensearch.client.indices.GetMappingsRequest;
 import org.opensearch.client.indices.GetMappingsResponse;
 import org.opensearch.cluster.metadata.AliasMetadata;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.ml.client.MachineLearningClient;
 
 /**
  * OpenSearch REST client to support standalone mode that runs entire engine from remote.
@@ -155,5 +156,12 @@ public class OpenSearchRestClient implements OpenSearchClient {
   @Override
   public void schedule(Runnable task) {
     task.run();
+  }
+
+  @Override
+  public MachineLearningClient ml() {
+    throw new UnsupportedOperationException("unsupported method");
+
+    // How about the rest client?
   }
 }

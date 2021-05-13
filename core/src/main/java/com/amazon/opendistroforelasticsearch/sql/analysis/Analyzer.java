@@ -46,6 +46,7 @@ import com.amazon.opendistroforelasticsearch.sql.ast.tree.Dedupe;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.Eval;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.Filter;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.Head;
+import com.amazon.opendistroforelasticsearch.sql.ast.tree.Kmeans;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.Limit;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.Project;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.RareTopN;
@@ -57,6 +58,7 @@ import com.amazon.opendistroforelasticsearch.sql.ast.tree.Sort.SortOption;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.UnresolvedPlan;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.Values;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprMissingValue;
+import com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType;
 import com.amazon.opendistroforelasticsearch.sql.exception.SemanticCheckException;
 import com.amazon.opendistroforelasticsearch.sql.expression.DSL;
 import com.amazon.opendistroforelasticsearch.sql.expression.Expression;
@@ -69,6 +71,7 @@ import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalAggregat
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalDedupe;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalEval;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalFilter;
+import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalKmeans;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalLimit;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalPlan;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalProject;
@@ -374,7 +377,25 @@ public class Analyzer extends AbstractNodeVisitor<LogicalPlan, AnalysisContext> 
     return new LogicalLimit(child, node.getSize(), 0);
   }
 
+  /**
+   * Build {@link LogicalKmeans}.
+   */
   @Override
+  public LogicalPlan visitKmeans(Kmeans node, AnalysisContext context) {
+    LogicalPlan child = node.getChild().get(0).accept(this, context);
+    List<Argument> options = node.getOptions();
+    Integer numberOfClusters = (Integer) (options.get(0).getValue().getValue());
+
+    context.push();
+    TypeEnvironment newEnv = context.peek();
+    newEnv.define(new Symbol(Namespace.FIELD_NAME,
+        "clusterId"), ExprCoreType.INTEGER);
+
+    return new LogicalKmeans(child, numberOfClusters);
+  }
+
+  @Override
+
   public LogicalPlan visitValues(Values node, AnalysisContext context) {
     List<List<Literal>> values = node.getValues();
     List<List<LiteralExpression>> valueExprs = new ArrayList<>();

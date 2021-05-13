@@ -154,6 +154,14 @@ class PhysicalPlanNodeVisitorTest extends PhysicalPlanTestBase {
     }, null));
   }
 
+  @Test
+  public void test_visitKmeans() {
+    PhysicalPlanNodeVisitor physicalPlanNodeVisitor
+        = new PhysicalPlanNodeVisitor<Integer, Object>() {};
+
+    assertNull(physicalPlanNodeVisitor.visitKmeans(plan, null));
+  }
+
   public static class PhysicalPlanPrinter extends PhysicalPlanNodeVisitor<String, Integer> {
 
     public String print(PhysicalPlan node) {

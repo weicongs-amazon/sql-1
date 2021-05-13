@@ -83,7 +83,7 @@ public abstract class PhysicalPlanNodeVisitor<R, C> {
   public R visitSort(SortOperator node, C context) {
     return visitNode(node, context);
   }
-  
+
   public R visitRareTopN(RareTopNOperator node, C context) {
     return visitNode(node, context);
   }
@@ -92,4 +92,11 @@ public abstract class PhysicalPlanNodeVisitor<R, C> {
     return visitNode(node, context);
   }
 
+  public R visitKmeans(PhysicalPlan node, C context) {
+    return visitNode(node, context);
+  }
+
+  public R visitMachineLearning(PhysicalPlan node, C context) {
+    return visitNode(node, context);
+  }
 }

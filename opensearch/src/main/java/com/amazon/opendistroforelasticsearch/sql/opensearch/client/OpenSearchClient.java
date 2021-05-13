@@ -32,6 +32,7 @@ import com.amazon.opendistroforelasticsearch.sql.opensearch.request.OpenSearchRe
 import com.amazon.opendistroforelasticsearch.sql.opensearch.response.OpenSearchResponse;
 import java.util.List;
 import java.util.Map;
+import org.opensearch.ml.client.MachineLearningClient;
 
 /**
  * OpenSearch client abstraction to wrap different OpenSearch client implementation. For
@@ -85,4 +86,10 @@ public interface OpenSearchClient {
    * @param task task
    */
   void schedule(Runnable task);
+
+  /**
+   * Get machine learning client.
+   * @return machine learning client
+   */
+  MachineLearningClient ml();
 }

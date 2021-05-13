@@ -139,5 +139,4 @@ public class ArgumentFactoryTest extends AstBuilderTest {
   public void testNoArgConstructorForArgumentFactoryShouldPass() {
     new ArgumentFactory();
   }
-
 }

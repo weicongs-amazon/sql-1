@@ -128,6 +128,10 @@ class LogicalPlanNodeVisitorTest {
         relation, CommandType.TOP, ImmutableList.of(expression), expression);
     assertNull(rareTopN.accept(new LogicalPlanNodeVisitor<Integer, Object>() {
     }, null));
+
+    LogicalPlan kmeans = new LogicalKmeans(relation, 3);
+    assertNull(kmeans.accept(new LogicalPlanNodeVisitor<Integer, Object>() {
+    }, null));
   }
 
   private static class NodesCount extends LogicalPlanNodeVisitor<Integer, Object> {

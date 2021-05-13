@@ -62,6 +62,7 @@ import com.amazon.opendistroforelasticsearch.sql.opensearch.client.OpenSearchCli
 import com.amazon.opendistroforelasticsearch.sql.opensearch.data.value.OpenSearchExprValueFactory;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.executor.protector.OpenSearchExecutionProtector;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.executor.protector.ResourceMonitorPlan;
+import com.amazon.opendistroforelasticsearch.sql.opensearch.planner.physical.KmeansOperator;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.setting.OpenSearchSettings;
 import com.amazon.opendistroforelasticsearch.sql.opensearch.storage.OpenSearchIndexScan;
 import com.amazon.opendistroforelasticsearch.sql.planner.physical.PhysicalPlan;
@@ -78,6 +79,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opensearch.ml.client.MachineLearningClient;
 
 @ExtendWith(MockitoExtension.class)
 class OpenSearchExecutionProtectorTest {
@@ -272,6 +274,15 @@ class OpenSearchExecutionProtectorTest {
                 filterExpr)
         )
     );
+  }
+
+  @Test
+  public void testVisitKmeans() {
+    MachineLearningClient machineLearningClient = mock(MachineLearningClient.class);
+    KmeansOperator kmeansOperator = new KmeansOperator(values(emptyList()),
+        3,
+        machineLearningClient);
+    assertEquals(kmeansOperator, executionProtector.visitKmeans(kmeansOperator, null));
   }
 
   PhysicalPlan resourceMonitor(PhysicalPlan input) {

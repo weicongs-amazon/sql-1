@@ -30,11 +30,17 @@ package com.amazon.opendistroforelasticsearch.sql.opensearch.storage;
 
 import static com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalPlanDSL.relation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.amazon.opendistroforelasticsearch.sql.opensearch.client.OpenSearchClient;
+import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalKmeans;
+import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalPlan;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,13 +49,16 @@ public class OpenSearchDefaultImplementorTest {
   @Mock
   OpenSearchIndexScan indexScan;
 
+  @Mock
+  OpenSearchClient client;
+
   /**
    * For test coverage.
    */
   @Test
   public void visitInvalidTypeShouldThrowException() {
     final OpenSearchIndex.OpenSearchDefaultImplementor implementor =
-        new OpenSearchIndex.OpenSearchDefaultImplementor(indexScan);
+        new OpenSearchIndex.OpenSearchDefaultImplementor(indexScan, client);
 
     final IllegalStateException exception =
         assertThrows(IllegalStateException.class, () -> implementor.visitNode(relation("index"),
@@ -59,5 +68,14 @@ public class OpenSearchDefaultImplementorTest {
         "unexpected plan node type "
             + "class com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalRelation",
         exception.getMessage());
+  }
+
+  @Test
+  public void visitKmeans() {
+    LogicalKmeans node = Mockito.mock(LogicalKmeans.class, Answers.RETURNS_DEEP_STUBS);
+    Mockito.when(node.getChild().get(0)).thenReturn(Mockito.mock(LogicalPlan.class));
+    OpenSearchIndex.OpenSearchDefaultImplementor implementor =
+        new OpenSearchIndex.OpenSearchDefaultImplementor(indexScan, client);
+    assertNotNull(implementor.visitKmeans(node, indexScan));
   }
 }

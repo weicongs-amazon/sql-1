@@ -54,6 +54,8 @@ import org.opensearch.cluster.metadata.MappingMetadata;
 import org.opensearch.cluster.service.ClusterService;
 import org.opensearch.common.collect.ImmutableOpenMap;
 import org.opensearch.common.unit.TimeValue;
+import org.opensearch.ml.client.MachineLearningClient;
+import org.opensearch.ml.client.MachineLearningNodeClient;
 import org.opensearch.threadpool.ThreadPool;
 
 /** OpenSearch connection by node client. */
@@ -198,5 +200,10 @@ public class OpenSearchNodeClient implements OpenSearchClient {
       ThreadContext.putAll(currentContext);
       task.run();
     };
+  }
+
+  @Override
+  public MachineLearningClient ml() {
+    return new MachineLearningNodeClient(client);
   }
 }
