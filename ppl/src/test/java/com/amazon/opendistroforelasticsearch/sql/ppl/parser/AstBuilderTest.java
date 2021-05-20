@@ -58,6 +58,7 @@ import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 
 import com.amazon.opendistroforelasticsearch.sql.ast.Node;
+import com.amazon.opendistroforelasticsearch.sql.ast.tree.Kmeans;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.RareTopN.CommandType;
 import com.amazon.opendistroforelasticsearch.sql.ppl.antlr.PPLSyntaxParser;
 import org.junit.Ignore;
@@ -490,6 +491,12 @@ public class AstBuilderTest {
             field("a"),
             field("b")
         ));
+  }
+
+  @Test
+  public void testKmeansCommand() {
+    assertEqual("source=t | kmeans 3",
+        new Kmeans(relation("t"),exprList(argument("k", intLiteral(3)))));
   }
 
   protected void assertEqual(String query, Node expectedPlan) {

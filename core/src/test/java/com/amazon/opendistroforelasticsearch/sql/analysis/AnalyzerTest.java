@@ -52,11 +52,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.amazon.opendistroforelasticsearch.sql.ast.dsl.AstDSL;
 import com.amazon.opendistroforelasticsearch.sql.ast.expression.Argument;
+import com.amazon.opendistroforelasticsearch.sql.ast.tree.Kmeans;
 import com.amazon.opendistroforelasticsearch.sql.ast.tree.RareTopN.CommandType;
 import com.amazon.opendistroforelasticsearch.sql.exception.SemanticCheckException;
 import com.amazon.opendistroforelasticsearch.sql.expression.DSL;
 import com.amazon.opendistroforelasticsearch.sql.expression.config.ExpressionConfig;
 import com.amazon.opendistroforelasticsearch.sql.expression.window.WindowDefinition;
+import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalMachineLearning;
 import com.amazon.opendistroforelasticsearch.sql.planner.logical.LogicalPlanDSL;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -622,6 +624,17 @@ class AnalyzerTest extends AnalyzerTestBase {
             ),
             AstDSL.alias("integer_value", qualifiedName("integer_value"))
         )
+    );
+  }
+
+  @Test
+  public void kmeans_relation() {
+    assertAnalyzeEqual(
+        new LogicalMachineLearning(LogicalPlanDSL.relation("schema"),
+            "kmeans",
+            AstDSL.exprList(AstDSL.argument("k", AstDSL.intLiteral(3)))),
+        new Kmeans(AstDSL.relation("schema"),
+            AstDSL.exprList(AstDSL.argument("k", AstDSL.intLiteral(3))))
     );
   }
 }

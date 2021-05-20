@@ -29,6 +29,7 @@
 package com.amazon.opendistroforelasticsearch.sql.opensearch.executor.protector;
 
 import com.amazon.opendistroforelasticsearch.sql.monitor.ResourceMonitor;
+import com.amazon.opendistroforelasticsearch.sql.opensearch.planner.physical.MachineLearningOperator;
 import com.amazon.opendistroforelasticsearch.sql.planner.physical.AggregationOperator;
 import com.amazon.opendistroforelasticsearch.sql.planner.physical.DedupeOperator;
 import com.amazon.opendistroforelasticsearch.sql.planner.physical.EvalOperator;
@@ -145,6 +146,16 @@ public class OpenSearchExecutionProtector extends ExecutionProtector {
         visitInput(node.getInput(), context),
         node.getLimit(),
         node.getOffset());
+  }
+
+  @Override
+  public PhysicalPlan visitMachineLearning(PhysicalPlan node, Object context) {
+    MachineLearningOperator machineLearningOperator = (MachineLearningOperator) node;
+    return new MachineLearningOperator(visitInput(machineLearningOperator.getInput(), context),
+        machineLearningOperator.getAlgorithm(),
+        machineLearningOperator.getArguments(),
+        machineLearningOperator.getModelId(),
+        machineLearningOperator.getMachineLearningClient());
   }
 
   PhysicalPlan visitInput(PhysicalPlan node, Object context) {

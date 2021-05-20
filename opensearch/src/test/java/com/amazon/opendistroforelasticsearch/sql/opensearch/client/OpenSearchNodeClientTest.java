@@ -30,6 +30,7 @@ package com.amazon.opendistroforelasticsearch.sql.opensearch.client;
 import static com.amazon.opendistroforelasticsearch.sql.opensearch.client.OpenSearchClient.META_CLUSTER_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -299,6 +300,13 @@ class OpenSearchNodeClientTest {
         new OpenSearchNodeClient(mockService, nodeClient);
     final Map<String, String> meta = client.meta();
     assertEquals("cluster-name", meta.get(META_CLUSTER_NAME));
+  }
+
+  @Test
+  void ml() {
+    OpenSearchNodeClient client =
+        new OpenSearchNodeClient(mock(ClusterService.class), nodeClient);
+    assertNotNull(client.ml());
   }
 
   private OpenSearchNodeClient mockClient(String indexName, String mappings) {

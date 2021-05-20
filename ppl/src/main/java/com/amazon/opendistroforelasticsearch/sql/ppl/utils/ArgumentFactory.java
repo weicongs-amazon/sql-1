@@ -39,6 +39,7 @@ import com.amazon.opendistroforelasticsearch.sql.ast.expression.Argument;
 import com.amazon.opendistroforelasticsearch.sql.ast.expression.DataType;
 import com.amazon.opendistroforelasticsearch.sql.ast.expression.Literal;
 import com.amazon.opendistroforelasticsearch.sql.common.utils.StringUtils;
+import com.amazon.opendistroforelasticsearch.sql.ppl.antlr.parser.OpenSearchPPLParser.KmeansCommandContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -153,6 +154,17 @@ public class ArgumentFactory {
   public static List<Argument> getArgumentList(RareCommandContext ctx) {
     return Collections
         .singletonList(new Argument("noOfResults", new Literal(10, DataType.INTEGER)));
+  }
+
+  /**
+   * Get list of {@link Argument}.
+   *
+   * @param ctx KmeansCommandContext instance
+   * @return the list of arguments fetched from the kmeans command
+   */
+  public static List<Argument> getArgumentList(KmeansCommandContext ctx) {
+    return Collections
+        .singletonList(new Argument("k", getArgumentValue(ctx.k)));
   }
 
   private static Literal getArgumentValue(ParserRuleContext ctx) {
