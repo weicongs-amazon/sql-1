@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +29,10 @@ import org.opensearch.ml.common.dataframe.Row;
 import org.opensearch.ml.common.parameter.MLParameter;
 import org.opensearch.ml.common.parameter.MLParameterBuilder;
 
+/**
+ * Machine Learning Physical operator to call machine learning interface to get results for
+ * algorithm execution.
+ */
 @RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class MachineLearningOperator extends PhysicalPlan {
@@ -60,10 +63,24 @@ public class MachineLearningOperator extends PhysicalPlan {
     DataFrame predictionResult = machineLearningClient
         .predict(algorithm, mlParameters, inputDataFrame, modelId)
         .actionGet(30, TimeUnit.SECONDS);
-    ColumnMeta[] columnMetas = predictionResult.columnMetas();
-    iterator = StreamSupport.stream(predictionResult.spliterator(), false)
-      .map(row -> convertRowIntoExprValue(columnMetas, row))
-      .iterator();
+    Iterator<Row> inputRowIter = inputDataFrame.iterator();
+    Iterator<Row> resultRowIter = predictionResult.iterator();
+    iterator = new Iterator<ExprValue>() {
+      @Override
+      public boolean hasNext() {
+        return inputRowIter.hasNext();
+      }
+
+      @Override
+      public ExprValue next() {
+        ImmutableMap.Builder<String, ExprValue> resultBuilder = new ImmutableMap.Builder<>();
+        resultBuilder.putAll(convertRowIntoExprValue(inputDataFrame.columnMetas(),
+            inputRowIter.next()));
+        resultBuilder.putAll(convertRowIntoExprValue(predictionResult.columnMetas(),
+            resultRowIter.next()));
+        return ExprTupleValue.fromExprValueMap(resultBuilder.build());
+      }
+    };
   }
 
   protected MLParameter convertArgumentToMLParameter(Argument argument) {
@@ -86,7 +103,7 @@ public class MachineLearningOperator extends PhysicalPlan {
     }
   }
 
-  private ExprValue convertRowIntoExprValue(ColumnMeta[] columnMetas, Row row) {
+  private Map<String, ExprValue> convertRowIntoExprValue(ColumnMeta[] columnMetas, Row row) {
     ImmutableMap.Builder<String, ExprValue> resultBuilder = new ImmutableMap.Builder<>();
     for (int i = 0; i < columnMetas.length; i++) {
       ColumnValue columnValue = row.getValue(i);
@@ -106,7 +123,7 @@ public class MachineLearningOperator extends PhysicalPlan {
       }
     }
 
-    return ExprTupleValue.fromExprValueMap(resultBuilder.build());
+    return resultBuilder.build();
   }
 
   private DataFrame generateInputDataset() {

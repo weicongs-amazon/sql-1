@@ -385,9 +385,8 @@ public class Analyzer extends AbstractNodeVisitor<LogicalPlan, AnalysisContext> 
     LogicalPlan child = node.getChild().get(0).accept(this, context);
     List<Argument> options = node.getOptions();
 
-    context.push();
-    TypeEnvironment newEnv = context.peek();
-    newEnv.define(new Symbol(Namespace.FIELD_NAME,
+    TypeEnvironment currentEnv = context.peek();
+    currentEnv.define(new Symbol(Namespace.FIELD_NAME,
         "clusterId"), ExprCoreType.INTEGER);
 
     return new LogicalMachineLearning(child, "kmeans", options);

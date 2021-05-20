@@ -43,7 +43,7 @@ dependencies {
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-cbor', version: '2.11.4'
     compile group: 'org.json', name: 'json', version:'20180813'
     compileOnly group: 'org.opensearch.client', name: 'opensearch-rest-high-level-client', version: "${opensearch_version}"
-    compile group: 'org.opensearch.ml', name:'opensearch-ml-client', version: '1.13.0.0'
+    compile group: 'org.opensearch.ml', name:'opensearch-ml-client', version: '1.0.0.0'
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.2')
     testCompile group: 'org.hamcrest', name: 'hamcrest-library', version: '2.1'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.0'

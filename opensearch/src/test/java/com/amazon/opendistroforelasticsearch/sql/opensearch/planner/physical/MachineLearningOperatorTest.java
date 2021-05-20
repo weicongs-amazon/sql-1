@@ -63,10 +63,10 @@ class MachineLearningOperatorTest {
     when(input.next()).thenReturn(ExprTupleValue.fromExprValueMap(resultBuilder.build()));
 
     DataFrame dataFrame = DataFrameBuilder
-        .load(Collections.singletonList(ImmutableMap.<String, Object>builder().put("k1", 2D)
-            .put("k2", 1)
-            .put("k3", "v3")
-            .put("k4", true)
+        .load(Collections.singletonList(ImmutableMap.<String, Object>builder().put("result-k1", 2D)
+            .put("result-k2", 1)
+            .put("result-k3", "v3")
+            .put("result-k4", true)
             .build())
         );
     when(machineLearningClient.predict(anyString(), anyList(), any(DataFrame.class), anyString())
